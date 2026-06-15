@@ -3,20 +3,30 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Group location tracking API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: groups
+    description: Group management
+  - name: members
+    description: Group members
+  - name: locations
+    description: Location updates
+  - name: messages
+    description: Group chat
+  - name: meeting-points
+    description: Meeting point coordination
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +34,301 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /groups:
+    post:
+      operationId: createGroup
+      tags: [groups]
+      summary: Create a new group
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GroupInput"
+      responses:
+        "201":
+          description: Group created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroupWithToken"
+
+  /groups/join:
+    post:
+      operationId: joinGroup
+      tags: [groups]
+      summary: Join a group via invite code or link
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JoinGroupInput"
+      responses:
+        "200":
+          description: Joined successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroupWithToken"
+        "404":
+          description: Group not found
+
+  /groups/{groupId}:
+    get:
+      operationId: getGroup
+      tags: [groups]
+      summary: Get group details
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Group details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Group"
+        "403":
+          description: Not a member
+        "404":
+          description: Not found
+
+  /groups/{groupId}/members:
+    get:
+      operationId: getGroupMembers
+      tags: [members]
+      summary: Get all members of a group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Member list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Member"
+
+  /groups/{groupId}/members/me/leave:
+    post:
+      operationId: leaveGroup
+      tags: [members]
+      summary: Leave a group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Left group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /groups/{groupId}/locations:
+    get:
+      operationId: getGroupLocations
+      tags: [locations]
+      summary: Get latest locations of all group members
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Member locations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MemberLocation"
+    post:
+      operationId: updateLocation
+      tags: [locations]
+      summary: Update my location
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LocationInput"
+      responses:
+        "200":
+          description: Location updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MemberLocation"
+
+  /groups/{groupId}/locations/sharing:
+    patch:
+      operationId: updateLocationSharing
+      tags: [locations]
+      summary: Toggle location sharing on/off
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LocationSharingInput"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /groups/{groupId}/meeting-point:
+    get:
+      operationId: getMeetingPoint
+      tags: [meeting-points]
+      summary: Get current meeting point
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Meeting point
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeetingPoint"
+    post:
+      operationId: setMeetingPoint
+      tags: [meeting-points]
+      summary: Set a meeting point
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MeetingPointInput"
+      responses:
+        "200":
+          description: Meeting point set
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeetingPoint"
+    delete:
+      operationId: clearMeetingPoint
+      tags: [meeting-points]
+      summary: Clear the meeting point
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Cleared
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /groups/{groupId}/sos:
+    post:
+      operationId: triggerSos
+      tags: [groups]
+      summary: Trigger SOS alert for group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: SOS triggered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /groups/{groupId}/messages:
+    get:
+      operationId: listMessages
+      tags: [messages]
+      summary: Get recent group chat messages
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Message"
+    post:
+      operationId: sendMessage
+      tags: [messages]
+      summary: Send a chat message
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MessageInput"
+      responses:
+        "201":
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +339,212 @@ components:
       required:
         - status
 
+    OkResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+      required:
+        - ok
+
+    Group:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        inviteCode:
+          type: string
+        createdAt:
+          type: string
+        memberCount:
+          type: integer
+      required:
+        - id
+        - name
+        - inviteCode
+        - createdAt
+        - memberCount
+
+    GroupWithToken:
+      type: object
+      properties:
+        group:
+          $ref: "#/components/schemas/Group"
+        memberId:
+          type: string
+        token:
+          type: string
+      required:
+        - group
+        - memberId
+        - token
+
+    GroupInput:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        creatorName:
+          type: string
+          minLength: 1
+          maxLength: 50
+      required:
+        - name
+        - creatorName
+
+    JoinGroupInput:
+      type: object
+      properties:
+        inviteCode:
+          type: string
+        memberName:
+          type: string
+          minLength: 1
+          maxLength: 50
+      required:
+        - inviteCode
+        - memberName
+
+    Member:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        groupId:
+          type: string
+        isLocationSharing:
+          type: boolean
+        joinedAt:
+          type: string
+      required:
+        - id
+        - name
+        - groupId
+        - isLocationSharing
+        - joinedAt
+
+    MemberLocation:
+      type: object
+      properties:
+        memberId:
+          type: string
+        memberName:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        accuracy:
+          type: ["number", "null"]
+        updatedAt:
+          type: string
+        isSharing:
+          type: boolean
+      required:
+        - memberId
+        - memberName
+        - latitude
+        - longitude
+        - updatedAt
+        - isSharing
+
+    LocationInput:
+      type: object
+      properties:
+        latitude:
+          type: number
+        longitude:
+          type: number
+        accuracy:
+          type: ["number", "null"]
+      required:
+        - latitude
+        - longitude
+
+    LocationSharingInput:
+      type: object
+      properties:
+        isSharing:
+          type: boolean
+      required:
+        - isSharing
+
+    MeetingPoint:
+      type: object
+      properties:
+        id:
+          type: string
+        groupId:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        label:
+          type: ["string", "null"]
+        setByName:
+          type: string
+        setAt:
+          type: string
+      required:
+        - id
+        - groupId
+        - latitude
+        - longitude
+        - setByName
+        - setAt
+
+    MeetingPointInput:
+      type: object
+      properties:
+        latitude:
+          type: number
+        longitude:
+          type: number
+        label:
+          type: ["string", "null"]
+      required:
+        - latitude
+        - longitude
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+        groupId:
+          type: string
+        memberId:
+          type: ["string", "null"]
+        memberName:
+          type: string
+        content:
+          type: string
+        type:
+          type: string
+          enum: [chat, system, sos, meeting_point]
+        createdAt:
+          type: string
+      required:
+        - id
+        - groupId
+        - memberName
+        - content
+        - type
+        - createdAt
+
+    MessageInput:
+      type: object
+      properties:
+        content:
+          type: string
+          minLength: 1
+          maxLength: 2000
+      required:
+        - content
