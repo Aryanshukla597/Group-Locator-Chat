@@ -33,7 +33,7 @@ export function useWebSocket(groupId: string | undefined, onMessage: MessageHand
     const session = getSession();
     if (!session) return;
 
-    const apiBaseUrl = import.meta.env.VITE_API_URL;
+    const apiBaseUrl = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "https://group-locator-production.up.railway.app" : "");
     const apiHost = apiBaseUrl
       ? apiBaseUrl.replace(/https?:\/\//, "")
       : window.location.host;

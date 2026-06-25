@@ -7,8 +7,9 @@ import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/HomePage";
 import GroupPage from "@/pages/GroupPage";
 
-if (import.meta.env.VITE_API_URL) {
-  setBaseUrl(import.meta.env.VITE_API_URL);
+const apiUrl = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "https://group-locator-production.up.railway.app" : "");
+if (apiUrl) {
+  setBaseUrl(apiUrl);
 }
 
 setAuthTokenGetter(() => {
