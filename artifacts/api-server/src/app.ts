@@ -26,14 +26,29 @@ app.use(
     },
   }),
 );
-app.use(cors());
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      const isLocalhost = origin.startsWith("http://localhost:") || origin === "http://localhost";
+      const isVercel = origin.endsWith(".vercel.app");
+      const isRailway = origin.endsWith(".up.railway.app");
+      if (isLocalhost || isVercel || isRailway) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Backend is running");
+  res.json({ status: "ok" });
 });
 
 export default app;
