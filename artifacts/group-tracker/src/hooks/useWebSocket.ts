@@ -33,8 +33,15 @@ export function useWebSocket(groupId: string | undefined, onMessage: MessageHand
     const session = getSession();
     if (!session) return;
 
-    const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const url = `${proto}//${window.location.host}/api/ws?groupId=${groupId}&token=${session.token}`;
+    const apiBaseUrl = import.meta.env.VITE_API_URL;
+    const apiHost = apiBaseUrl
+      ? apiBaseUrl.replace(/https?:\/\//, "")
+      : window.location.host;
+    const proto = apiBaseUrl
+      ? (apiBaseUrl.startsWith("https") ? "wss:" : "ws:")
+      : (window.location.protocol === "https:" ? "wss:" : "ws:");
+
+    const url = `${proto}//${apiHost}/api/ws?groupId=${groupId}&token=${session.token}`;
 
     const ws = new WebSocket(url);
     wsRef.current = ws;
