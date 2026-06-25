@@ -12,4 +12,6 @@ export interface MessageInput {
      * @maxLength 2000
      */
   content: string;
+  /** @nullable */
+  replyToId?: string | null;
 }

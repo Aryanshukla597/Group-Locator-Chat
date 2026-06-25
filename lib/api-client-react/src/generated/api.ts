@@ -27,13 +27,19 @@ import type {
   JoinGroupInput,
   LocationInput,
   LocationSharingInput,
+  MarkMessagesReadBody,
   MeetingPoint,
   MeetingPointInput,
   Member,
   MemberLocation,
   Message,
   MessageInput,
-  OkResponse
+  OkResponse,
+  PinMessageBody,
+  TriggerSosBody,
+  UpdateMemberActiveBody,
+  UpdateMemberRoleInput,
+  UpdateMemberStatusBody
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -491,6 +497,368 @@ export const useLeaveGroup = <TError = ErrorType<unknown>,
       return useMutation(getLeaveGroupMutationOptions(options));
     }
 
+export const getUpdateMemberStatusUrl = (groupId: string,) => {
+
+
+
+
+  return `/api/groups/${groupId}/members/me/status`
+}
+
+/**
+ * @summary Update my online status
+ */
+export const updateMemberStatus = async (groupId: string,
+    updateMemberStatusBody: UpdateMemberStatusBody, options?: RequestInit): Promise<OkResponse> => {
+
+  return customFetch<OkResponse>(getUpdateMemberStatusUrl(groupId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateMemberStatusBody,)
+  }
+);}
+
+
+
+
+export const getUpdateMemberStatusMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMemberStatus>>, TError,{groupId: string;data: BodyType<UpdateMemberStatusBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateMemberStatus>>, TError,{groupId: string;data: BodyType<UpdateMemberStatusBody>}, TContext> => {
+
+const mutationKey = ['updateMemberStatus'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateMemberStatus>>, {groupId: string;data: BodyType<UpdateMemberStatusBody>}> = (props) => {
+          const {groupId,data} = props ?? {};
+
+          return  updateMemberStatus(groupId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateMemberStatusMutationResult = NonNullable<Awaited<ReturnType<typeof updateMemberStatus>>>
+    export type UpdateMemberStatusMutationBody = BodyType<UpdateMemberStatusBody>
+    export type UpdateMemberStatusMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Update my online status
+ */
+export const useUpdateMemberStatus = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMemberStatus>>, TError,{groupId: string;data: BodyType<UpdateMemberStatusBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateMemberStatus>>,
+        TError,
+        {groupId: string;data: BodyType<UpdateMemberStatusBody>},
+        TContext
+      > => {
+      return useMutation(getUpdateMemberStatusMutationOptions(options));
+    }
+
+export const getUpdateMemberActiveUrl = (groupId: string,) => {
+
+
+
+
+  return `/api/groups/${groupId}/members/me/active`
+}
+
+/**
+ * @summary Update my active (focused) screen status
+ */
+export const updateMemberActive = async (groupId: string,
+    updateMemberActiveBody: UpdateMemberActiveBody, options?: RequestInit): Promise<OkResponse> => {
+
+  return customFetch<OkResponse>(getUpdateMemberActiveUrl(groupId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateMemberActiveBody,)
+  }
+);}
+
+
+
+
+export const getUpdateMemberActiveMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMemberActive>>, TError,{groupId: string;data: BodyType<UpdateMemberActiveBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateMemberActive>>, TError,{groupId: string;data: BodyType<UpdateMemberActiveBody>}, TContext> => {
+
+const mutationKey = ['updateMemberActive'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateMemberActive>>, {groupId: string;data: BodyType<UpdateMemberActiveBody>}> = (props) => {
+          const {groupId,data} = props ?? {};
+
+          return  updateMemberActive(groupId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateMemberActiveMutationResult = NonNullable<Awaited<ReturnType<typeof updateMemberActive>>>
+    export type UpdateMemberActiveMutationBody = BodyType<UpdateMemberActiveBody>
+    export type UpdateMemberActiveMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Update my active (focused) screen status
+ */
+export const useUpdateMemberActive = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMemberActive>>, TError,{groupId: string;data: BodyType<UpdateMemberActiveBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateMemberActive>>,
+        TError,
+        {groupId: string;data: BodyType<UpdateMemberActiveBody>},
+        TContext
+      > => {
+      return useMutation(getUpdateMemberActiveMutationOptions(options));
+    }
+
+export const getMarkMessagesReadUrl = (groupId: string,) => {
+
+
+
+
+  return `/api/groups/${groupId}/members/me/read`
+}
+
+/**
+ * @summary Mark group messages up to messageId as read
+ */
+export const markMessagesRead = async (groupId: string,
+    markMessagesReadBody: MarkMessagesReadBody, options?: RequestInit): Promise<OkResponse> => {
+
+  return customFetch<OkResponse>(getMarkMessagesReadUrl(groupId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      markMessagesReadBody,)
+  }
+);}
+
+
+
+
+export const getMarkMessagesReadMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markMessagesRead>>, TError,{groupId: string;data: BodyType<MarkMessagesReadBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof markMessagesRead>>, TError,{groupId: string;data: BodyType<MarkMessagesReadBody>}, TContext> => {
+
+const mutationKey = ['markMessagesRead'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof markMessagesRead>>, {groupId: string;data: BodyType<MarkMessagesReadBody>}> = (props) => {
+          const {groupId,data} = props ?? {};
+
+          return  markMessagesRead(groupId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type MarkMessagesReadMutationResult = NonNullable<Awaited<ReturnType<typeof markMessagesRead>>>
+    export type MarkMessagesReadMutationBody = BodyType<MarkMessagesReadBody>
+    export type MarkMessagesReadMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Mark group messages up to messageId as read
+ */
+export const useMarkMessagesRead = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markMessagesRead>>, TError,{groupId: string;data: BodyType<MarkMessagesReadBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof markMessagesRead>>,
+        TError,
+        {groupId: string;data: BodyType<MarkMessagesReadBody>},
+        TContext
+      > => {
+      return useMutation(getMarkMessagesReadMutationOptions(options));
+    }
+
+export const getUpdateMemberRoleUrl = (groupId: string,
+    memberId: string,) => {
+
+
+
+
+  return `/api/groups/${groupId}/members/${memberId}/role`
+}
+
+/**
+ * @summary Update a member's role (promote/demote)
+ */
+export const updateMemberRole = async (groupId: string,
+    memberId: string,
+    updateMemberRoleInput: UpdateMemberRoleInput, options?: RequestInit): Promise<OkResponse> => {
+
+  return customFetch<OkResponse>(getUpdateMemberRoleUrl(groupId,memberId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateMemberRoleInput,)
+  }
+);}
+
+
+
+
+export const getUpdateMemberRoleMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMemberRole>>, TError,{groupId: string;memberId: string;data: BodyType<UpdateMemberRoleInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateMemberRole>>, TError,{groupId: string;memberId: string;data: BodyType<UpdateMemberRoleInput>}, TContext> => {
+
+const mutationKey = ['updateMemberRole'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateMemberRole>>, {groupId: string;memberId: string;data: BodyType<UpdateMemberRoleInput>}> = (props) => {
+          const {groupId,memberId,data} = props ?? {};
+
+          return  updateMemberRole(groupId,memberId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateMemberRoleMutationResult = NonNullable<Awaited<ReturnType<typeof updateMemberRole>>>
+    export type UpdateMemberRoleMutationBody = BodyType<UpdateMemberRoleInput>
+    export type UpdateMemberRoleMutationError = ErrorType<void>
+
+    /**
+ * @summary Update a member's role (promote/demote)
+ */
+export const useUpdateMemberRole = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMemberRole>>, TError,{groupId: string;memberId: string;data: BodyType<UpdateMemberRoleInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateMemberRole>>,
+        TError,
+        {groupId: string;memberId: string;data: BodyType<UpdateMemberRoleInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateMemberRoleMutationOptions(options));
+    }
+
+export const getRemoveMemberUrl = (groupId: string,
+    memberId: string,) => {
+
+
+
+
+  return `/api/groups/${groupId}/members/${memberId}`
+}
+
+/**
+ * @summary Remove a member from the group (kick)
+ */
+export const removeMember = async (groupId: string,
+    memberId: string, options?: RequestInit): Promise<OkResponse> => {
+
+  return customFetch<OkResponse>(getRemoveMemberUrl(groupId,memberId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getRemoveMemberMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeMember>>, TError,{groupId: string;memberId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof removeMember>>, TError,{groupId: string;memberId: string}, TContext> => {
+
+const mutationKey = ['removeMember'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof removeMember>>, {groupId: string;memberId: string}> = (props) => {
+          const {groupId,memberId} = props ?? {};
+
+          return  removeMember(groupId,memberId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RemoveMemberMutationResult = NonNullable<Awaited<ReturnType<typeof removeMember>>>
+
+    export type RemoveMemberMutationError = ErrorType<void>
+
+    /**
+ * @summary Remove a member from the group (kick)
+ */
+export const useRemoveMember = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeMember>>, TError,{groupId: string;memberId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof removeMember>>,
+        TError,
+        {groupId: string;memberId: string},
+        TContext
+      > => {
+      return useMutation(getRemoveMemberMutationOptions(options));
+    }
+
 export const getGetGroupLocationsUrl = (groupId: string,) => {
 
 
@@ -942,14 +1310,16 @@ export const getTriggerSosUrl = (groupId: string,) => {
 /**
  * @summary Trigger SOS alert for group
  */
-export const triggerSos = async (groupId: string, options?: RequestInit): Promise<OkResponse> => {
+export const triggerSos = async (groupId: string,
+    triggerSosBody?: TriggerSosBody, options?: RequestInit): Promise<OkResponse> => {
 
   return customFetch<OkResponse>(getTriggerSosUrl(groupId),
   {
     ...options,
-    method: 'POST'
-
-
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      triggerSosBody,)
   }
 );}
 
@@ -957,8 +1327,8 @@ export const triggerSos = async (groupId: string, options?: RequestInit): Promis
 
 
 export const getTriggerSosMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof triggerSos>>, TError,{groupId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof triggerSos>>, TError,{groupId: string}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof triggerSos>>, TError,{groupId: string;data?: BodyType<TriggerSosBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof triggerSos>>, TError,{groupId: string;data?: BodyType<TriggerSosBody>}, TContext> => {
 
 const mutationKey = ['triggerSos'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -970,10 +1340,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof triggerSos>>, {groupId: string}> = (props) => {
-          const {groupId} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof triggerSos>>, {groupId: string;data?: BodyType<TriggerSosBody>}> = (props) => {
+          const {groupId,data} = props ?? {};
 
-          return  triggerSos(groupId,requestOptions)
+          return  triggerSos(groupId,data,requestOptions)
         }
 
 
@@ -984,18 +1354,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type TriggerSosMutationResult = NonNullable<Awaited<ReturnType<typeof triggerSos>>>
-
+    export type TriggerSosMutationBody = BodyType<TriggerSosBody> | undefined
     export type TriggerSosMutationError = ErrorType<unknown>
 
     /**
  * @summary Trigger SOS alert for group
  */
 export const useTriggerSos = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof triggerSos>>, TError,{groupId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof triggerSos>>, TError,{groupId: string;data?: BodyType<TriggerSosBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof triggerSos>>,
         TError,
-        {groupId: string},
+        {groupId: string;data?: BodyType<TriggerSosBody>},
         TContext
       > => {
       return useMutation(getTriggerSosMutationOptions(options));
@@ -1148,5 +1518,225 @@ export const useSendMessage = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getSendMessageMutationOptions(options));
+    }
+
+export const getEditMessageUrl = (groupId: string,
+    messageId: string,) => {
+
+
+
+
+  return `/api/groups/${groupId}/messages/${messageId}`
+}
+
+/**
+ * @summary Edit a chat message
+ */
+export const editMessage = async (groupId: string,
+    messageId: string,
+    messageInput: MessageInput, options?: RequestInit): Promise<Message> => {
+
+  return customFetch<Message>(getEditMessageUrl(groupId,messageId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      messageInput,)
+  }
+);}
+
+
+
+
+export const getEditMessageMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof editMessage>>, TError,{groupId: string;messageId: string;data: BodyType<MessageInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof editMessage>>, TError,{groupId: string;messageId: string;data: BodyType<MessageInput>}, TContext> => {
+
+const mutationKey = ['editMessage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof editMessage>>, {groupId: string;messageId: string;data: BodyType<MessageInput>}> = (props) => {
+          const {groupId,messageId,data} = props ?? {};
+
+          return  editMessage(groupId,messageId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EditMessageMutationResult = NonNullable<Awaited<ReturnType<typeof editMessage>>>
+    export type EditMessageMutationBody = BodyType<MessageInput>
+    export type EditMessageMutationError = ErrorType<void>
+
+    /**
+ * @summary Edit a chat message
+ */
+export const useEditMessage = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof editMessage>>, TError,{groupId: string;messageId: string;data: BodyType<MessageInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof editMessage>>,
+        TError,
+        {groupId: string;messageId: string;data: BodyType<MessageInput>},
+        TContext
+      > => {
+      return useMutation(getEditMessageMutationOptions(options));
+    }
+
+export const getDeleteMessageUrl = (groupId: string,
+    messageId: string,) => {
+
+
+
+
+  return `/api/groups/${groupId}/messages/${messageId}`
+}
+
+/**
+ * @summary Delete a chat message
+ */
+export const deleteMessage = async (groupId: string,
+    messageId: string, options?: RequestInit): Promise<OkResponse> => {
+
+  return customFetch<OkResponse>(getDeleteMessageUrl(groupId,messageId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteMessageMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteMessage>>, TError,{groupId: string;messageId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteMessage>>, TError,{groupId: string;messageId: string}, TContext> => {
+
+const mutationKey = ['deleteMessage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteMessage>>, {groupId: string;messageId: string}> = (props) => {
+          const {groupId,messageId} = props ?? {};
+
+          return  deleteMessage(groupId,messageId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteMessageMutationResult = NonNullable<Awaited<ReturnType<typeof deleteMessage>>>
+
+    export type DeleteMessageMutationError = ErrorType<void>
+
+    /**
+ * @summary Delete a chat message
+ */
+export const useDeleteMessage = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteMessage>>, TError,{groupId: string;messageId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteMessage>>,
+        TError,
+        {groupId: string;messageId: string},
+        TContext
+      > => {
+      return useMutation(getDeleteMessageMutationOptions(options));
+    }
+
+export const getPinMessageUrl = (groupId: string,
+    messageId: string,) => {
+
+
+
+
+  return `/api/groups/${groupId}/messages/${messageId}/pin`
+}
+
+/**
+ * @summary Pin or unpin a chat message
+ */
+export const pinMessage = async (groupId: string,
+    messageId: string,
+    pinMessageBody: PinMessageBody, options?: RequestInit): Promise<Message> => {
+
+  return customFetch<Message>(getPinMessageUrl(groupId,messageId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      pinMessageBody,)
+  }
+);}
+
+
+
+
+export const getPinMessageMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof pinMessage>>, TError,{groupId: string;messageId: string;data: BodyType<PinMessageBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof pinMessage>>, TError,{groupId: string;messageId: string;data: BodyType<PinMessageBody>}, TContext> => {
+
+const mutationKey = ['pinMessage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof pinMessage>>, {groupId: string;messageId: string;data: BodyType<PinMessageBody>}> = (props) => {
+          const {groupId,messageId,data} = props ?? {};
+
+          return  pinMessage(groupId,messageId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PinMessageMutationResult = NonNullable<Awaited<ReturnType<typeof pinMessage>>>
+    export type PinMessageMutationBody = BodyType<PinMessageBody>
+    export type PinMessageMutationError = ErrorType<void>
+
+    /**
+ * @summary Pin or unpin a chat message
+ */
+export const usePinMessage = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof pinMessage>>, TError,{groupId: string;messageId: string;data: BodyType<PinMessageBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof pinMessage>>,
+        TError,
+        {groupId: string;messageId: string;data: BodyType<PinMessageBody>},
+        TContext
+      > => {
+      return useMutation(getPinMessageMutationOptions(options));
     }
 

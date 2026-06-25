@@ -5,11 +5,17 @@
  * Group location tracking API
  * OpenAPI spec version: 0.1.0
  */
+import type { MemberRole } from './memberRole';
 
 export interface Member {
   id: string;
   name: string;
   groupId: string;
   isLocationSharing: boolean;
+  isOnline: boolean;
+  isActive: boolean;
+  role: MemberRole;
+  /** @nullable */
+  lastReadMessageId?: string | null;
   joinedAt: string;
 }

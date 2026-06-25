@@ -17,6 +17,8 @@ export interface Group {
   id: string;
   name: string;
   inviteCode: string;
+  isLocked: boolean;
+  isActive: boolean;
   createdAt: string;
   memberCount: number;
 }
@@ -38,6 +40,7 @@ export interface GroupInput {
      * @maxLength 50
      */
   creatorName: string;
+  userId?: string;
 }
 
 export interface JoinGroupInput {
@@ -47,13 +50,28 @@ export interface JoinGroupInput {
      * @maxLength 50
      */
   memberName: string;
+  userId?: string;
 }
+
+export type MemberRole = typeof MemberRole[keyof typeof MemberRole];
+
+
+export const MemberRole = {
+  owner: 'owner',
+  admin: 'admin',
+  member: 'member',
+} as const;
 
 export interface Member {
   id: string;
   name: string;
   groupId: string;
   isLocationSharing: boolean;
+  isOnline: boolean;
+  isActive: boolean;
+  role: MemberRole;
+  /** @nullable */
+  lastReadMessageId?: string | null;
   joinedAt: string;
 }
 
@@ -66,6 +84,7 @@ export interface MemberLocation {
   accuracy?: number | null;
   updatedAt: string;
   isSharing: boolean;
+  isOnline: boolean;
 }
 
 export interface LocationInput {
@@ -104,6 +123,9 @@ export const MessageType = {
   chat: 'chat',
   system: 'system',
   sos: 'sos',
+  sos_medical: 'sos_medical',
+  sos_fire: 'sos_fire',
+  sos_police: 'sos_police',
   meeting_point: 'meeting_point',
 } as const;
 
@@ -115,6 +137,14 @@ export interface Message {
   memberName: string;
   content: string;
   type: MessageType;
+  isPinned: boolean;
+  /** @nullable */
+  replyToId?: string | null;
+  /** @nullable */
+  replyToName?: string | null;
+  /** @nullable */
+  replyToContent?: string | null;
+  isEdited: boolean;
   createdAt: string;
 }
 
@@ -124,5 +154,49 @@ export interface MessageInput {
      * @maxLength 2000
      */
   content: string;
+  /** @nullable */
+  replyToId?: string | null;
 }
+
+export type UpdateMemberRoleInputRole = typeof UpdateMemberRoleInputRole[keyof typeof UpdateMemberRoleInputRole];
+
+
+export const UpdateMemberRoleInputRole = {
+  admin: 'admin',
+  member: 'member',
+} as const;
+
+export interface UpdateMemberRoleInput {
+  role: UpdateMemberRoleInputRole;
+}
+
+export type UpdateMemberStatusBody = {
+  isOnline: boolean;
+};
+
+export type UpdateMemberActiveBody = {
+  isActive: boolean;
+};
+
+export type MarkMessagesReadBody = {
+  messageId: string;
+};
+
+export type TriggerSosBodyCategory = typeof TriggerSosBodyCategory[keyof typeof TriggerSosBodyCategory];
+
+
+export const TriggerSosBodyCategory = {
+  general: 'general',
+  medical: 'medical',
+  fire: 'fire',
+  police: 'police',
+} as const;
+
+export type TriggerSosBody = {
+  category: TriggerSosBodyCategory;
+};
+
+export type PinMessageBody = {
+  isPinned: boolean;
+};
 

@@ -27,7 +27,8 @@ export const createGroupBodyCreatorNameMax = 50;
 
 export const CreateGroupBody = zod.object({
   "name": zod.string().min(1).max(createGroupBodyNameMax),
-  "creatorName": zod.string().min(1).max(createGroupBodyCreatorNameMax)
+  "creatorName": zod.string().min(1).max(createGroupBodyCreatorNameMax),
+  "userId": zod.string().optional()
 })
 
 
@@ -40,7 +41,8 @@ export const joinGroupBodyMemberNameMax = 50;
 
 export const JoinGroupBody = zod.object({
   "inviteCode": zod.string(),
-  "memberName": zod.string().min(1).max(joinGroupBodyMemberNameMax)
+  "memberName": zod.string().min(1).max(joinGroupBodyMemberNameMax),
+  "userId": zod.string().optional()
 })
 
 export const JoinGroupResponse = zod.object({
@@ -48,6 +50,8 @@ export const JoinGroupResponse = zod.object({
   "id": zod.string(),
   "name": zod.string(),
   "inviteCode": zod.string(),
+  "isLocked": zod.boolean(),
+  "isActive": zod.boolean(),
   "createdAt": zod.string(),
   "memberCount": zod.number()
 }),
@@ -67,6 +71,8 @@ export const GetGroupResponse = zod.object({
   "id": zod.string(),
   "name": zod.string(),
   "inviteCode": zod.string(),
+  "isLocked": zod.boolean(),
+  "isActive": zod.boolean(),
   "createdAt": zod.string(),
   "memberCount": zod.number()
 })
@@ -84,6 +90,10 @@ export const GetGroupMembersResponseItem = zod.object({
   "name": zod.string(),
   "groupId": zod.string(),
   "isLocationSharing": zod.boolean(),
+  "isOnline": zod.boolean(),
+  "isActive": zod.boolean(),
+  "role": zod.enum(['owner', 'admin', 'member']),
+  "lastReadMessageId": zod.string().nullish(),
   "joinedAt": zod.string()
 })
 export const GetGroupMembersResponse = zod.array(GetGroupMembersResponseItem)
@@ -102,6 +112,84 @@ export const LeaveGroupResponse = zod.object({
 
 
 /**
+ * @summary Update my online status
+ */
+export const UpdateMemberStatusParams = zod.object({
+  "groupId": zod.coerce.string()
+})
+
+export const UpdateMemberStatusBody = zod.object({
+  "isOnline": zod.boolean()
+})
+
+export const UpdateMemberStatusResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+/**
+ * @summary Update my active (focused) screen status
+ */
+export const UpdateMemberActiveParams = zod.object({
+  "groupId": zod.coerce.string()
+})
+
+export const UpdateMemberActiveBody = zod.object({
+  "isActive": zod.boolean()
+})
+
+export const UpdateMemberActiveResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+/**
+ * @summary Mark group messages up to messageId as read
+ */
+export const MarkMessagesReadParams = zod.object({
+  "groupId": zod.coerce.string()
+})
+
+export const MarkMessagesReadBody = zod.object({
+  "messageId": zod.string()
+})
+
+export const MarkMessagesReadResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+/**
+ * @summary Update a member's role (promote/demote)
+ */
+export const UpdateMemberRoleParams = zod.object({
+  "groupId": zod.coerce.string(),
+  "memberId": zod.coerce.string()
+})
+
+export const UpdateMemberRoleBody = zod.object({
+  "role": zod.enum(['admin', 'member'])
+})
+
+export const UpdateMemberRoleResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+/**
+ * @summary Remove a member from the group (kick)
+ */
+export const RemoveMemberParams = zod.object({
+  "groupId": zod.coerce.string(),
+  "memberId": zod.coerce.string()
+})
+
+export const RemoveMemberResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+/**
  * @summary Get latest locations of all group members
  */
 export const GetGroupLocationsParams = zod.object({
@@ -115,7 +203,8 @@ export const GetGroupLocationsResponseItem = zod.object({
   "longitude": zod.number(),
   "accuracy": zod.number().nullish(),
   "updatedAt": zod.string(),
-  "isSharing": zod.boolean()
+  "isSharing": zod.boolean(),
+  "isOnline": zod.boolean()
 })
 export const GetGroupLocationsResponse = zod.array(GetGroupLocationsResponseItem)
 
@@ -140,7 +229,8 @@ export const UpdateLocationResponse = zod.object({
   "longitude": zod.number(),
   "accuracy": zod.number().nullish(),
   "updatedAt": zod.string(),
-  "isSharing": zod.boolean()
+  "isSharing": zod.boolean(),
+  "isOnline": zod.boolean()
 })
 
 
@@ -221,6 +311,10 @@ export const TriggerSosParams = zod.object({
   "groupId": zod.coerce.string()
 })
 
+export const TriggerSosBody = zod.object({
+  "category": zod.enum(['general', 'medical', 'fire', 'police'])
+})
+
 export const TriggerSosResponse = zod.object({
   "ok": zod.boolean()
 })
@@ -239,7 +333,12 @@ export const ListMessagesResponseItem = zod.object({
   "memberId": zod.string().nullish(),
   "memberName": zod.string(),
   "content": zod.string(),
-  "type": zod.enum(['chat', 'system', 'sos', 'meeting_point']),
+  "type": zod.enum(['chat', 'system', 'sos', 'sos_medical', 'sos_fire', 'sos_police', 'meeting_point']),
+  "isPinned": zod.boolean(),
+  "replyToId": zod.string().nullish(),
+  "replyToName": zod.string().nullish(),
+  "replyToContent": zod.string().nullish(),
+  "isEdited": zod.boolean(),
   "createdAt": zod.string()
 })
 export const ListMessagesResponse = zod.array(ListMessagesResponseItem)
@@ -257,7 +356,82 @@ export const sendMessageBodyContentMax = 2000;
 
 
 export const SendMessageBody = zod.object({
-  "content": zod.string().min(1).max(sendMessageBodyContentMax)
+  "content": zod.string().min(1).max(sendMessageBodyContentMax),
+  "replyToId": zod.string().nullish()
+})
+
+
+/**
+ * @summary Edit a chat message
+ */
+export const EditMessageParams = zod.object({
+  "groupId": zod.coerce.string(),
+  "messageId": zod.coerce.string()
+})
+
+export const editMessageBodyContentMax = 2000;
+
+
+
+export const EditMessageBody = zod.object({
+  "content": zod.string().min(1).max(editMessageBodyContentMax),
+  "replyToId": zod.string().nullish()
+})
+
+export const EditMessageResponse = zod.object({
+  "id": zod.string(),
+  "groupId": zod.string(),
+  "memberId": zod.string().nullish(),
+  "memberName": zod.string(),
+  "content": zod.string(),
+  "type": zod.enum(['chat', 'system', 'sos', 'sos_medical', 'sos_fire', 'sos_police', 'meeting_point']),
+  "isPinned": zod.boolean(),
+  "replyToId": zod.string().nullish(),
+  "replyToName": zod.string().nullish(),
+  "replyToContent": zod.string().nullish(),
+  "isEdited": zod.boolean(),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Delete a chat message
+ */
+export const DeleteMessageParams = zod.object({
+  "groupId": zod.coerce.string(),
+  "messageId": zod.coerce.string()
+})
+
+export const DeleteMessageResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+/**
+ * @summary Pin or unpin a chat message
+ */
+export const PinMessageParams = zod.object({
+  "groupId": zod.coerce.string(),
+  "messageId": zod.coerce.string()
+})
+
+export const PinMessageBody = zod.object({
+  "isPinned": zod.boolean()
+})
+
+export const PinMessageResponse = zod.object({
+  "id": zod.string(),
+  "groupId": zod.string(),
+  "memberId": zod.string().nullish(),
+  "memberName": zod.string(),
+  "content": zod.string(),
+  "type": zod.enum(['chat', 'system', 'sos', 'sos_medical', 'sos_fire', 'sos_police', 'meeting_point']),
+  "isPinned": zod.boolean(),
+  "replyToId": zod.string().nullish(),
+  "replyToName": zod.string().nullish(),
+  "replyToContent": zod.string().nullish(),
+  "isEdited": zod.boolean(),
+  "createdAt": zod.string()
 })
 
 

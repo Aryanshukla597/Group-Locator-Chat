@@ -13,4 +13,5 @@ export interface JoinGroupInput {
      * @maxLength 50
      */
   memberName: string;
+  userId?: string;
 }

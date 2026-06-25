@@ -13,5 +13,8 @@ export const MessageType = {
   chat: 'chat',
   system: 'system',
   sos: 'sos',
+  sos_medical: 'sos_medical',
+  sos_fire: 'sos_fire',
+  sos_police: 'sos_police',
   meeting_point: 'meeting_point',
 } as const;

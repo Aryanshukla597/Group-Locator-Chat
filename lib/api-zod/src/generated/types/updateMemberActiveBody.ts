@@ -6,12 +6,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface Group {
-  id: string;
-  name: string;
-  inviteCode: string;
-  isLocked: boolean;
+export type UpdateMemberActiveBody = {
   isActive: boolean;
-  createdAt: string;
-  memberCount: number;
-}
+};

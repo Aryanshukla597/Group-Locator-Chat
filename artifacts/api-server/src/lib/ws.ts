@@ -1,6 +1,6 @@
 import { WebSocketServer, WebSocket } from "ws";
 import { IncomingMessage, Server } from "http";
-import { db, membersTable } from "@workspace/db";
+import { db, membersTable, locationsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { logger } from "./logger";
 import { URL } from "url";
@@ -49,16 +49,63 @@ export function setupWebSocket(server: Server): WebSocketServer {
       groupClient = { ws, groupId, memberId: member.id, memberName: member.name };
       clients.set(ws, groupClient);
 
+      // Mark member as online in DB immediately on connect
+      await db.update(membersTable)
+        .set({ isOnline: true, isActive: true })
+        .where(eq(membersTable.id, member.id));
+
+      await db.update(locationsTable)
+        .set({ isOnline: true })
+        .where(eq(locationsTable.memberId, member.id));
+
+      // Broadcast online status to group members
+      broadcastToGroup(groupId, {
+        type: "location_sharing_changed",
+        payload: { memberId: member.id, isOnline: true, isSharing: member.isLocationSharing },
+      });
+
       logger.info({ groupId, memberId: member.id, memberName: member.name }, "WebSocket client connected");
 
       ws.on("message", (data) => {
         // Clients can send pings; ignore other messages (all updates go via REST)
       });
 
-      ws.on("close", () => {
+      ws.on("close", async () => {
         clients.delete(ws);
         if (groupClient) {
-          logger.info({ groupId: groupClient.groupId, memberId: groupClient.memberId }, "WebSocket client disconnected");
+          const remainingConnections = Array.from(clients.values()).filter(
+            (c) => c.memberId === groupClient!.memberId
+          ).length;
+
+          logger.info(
+            { groupId: groupClient.groupId, memberId: groupClient.memberId, remainingConnections },
+            "WebSocket client disconnected"
+          );
+
+          if (remainingConnections === 0) {
+            logger.info(
+              { groupId: groupClient.groupId, memberId: groupClient.memberId },
+              "No connections left — marking offline"
+            );
+            try {
+              // Mark member as offline in DB immediately on disconnect
+              await db.update(membersTable)
+                .set({ isOnline: false, isActive: false })
+                .where(eq(membersTable.id, groupClient.memberId));
+
+              await db.update(locationsTable)
+                .set({ isOnline: false, updatedAt: new Date() })
+                .where(eq(locationsTable.memberId, groupClient.memberId));
+
+              // Broadcast offline status to remaining group members
+              broadcastToGroup(groupClient.groupId, {
+                type: "location_sharing_changed",
+                payload: { memberId: groupClient.memberId, isOnline: false, isSharing: false },
+              });
+            } catch (err) {
+              logger.error({ err }, "Failed to mark member offline on disconnect");
+            }
+          }
         }
       });
 

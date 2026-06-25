@@ -30,3 +30,14 @@ export function clearSession(): void {
 export function getToken(): string | null {
   return getSession()?.token ?? null;
 }
+
+export function getOrInitializeUserId(): string {
+  let userId = localStorage.getItem("findmy_userId");
+  if (!userId) {
+    userId = typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
+      : Math.random().toString(36).substring(2) + Date.now().toString(36);
+    localStorage.setItem("findmy_userId", userId);
+  }
+  return userId;
+}

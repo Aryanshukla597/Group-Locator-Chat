@@ -17,4 +17,5 @@ export interface GroupInput {
      * @maxLength 50
      */
   creatorName: string;
+  userId?: string;
 }

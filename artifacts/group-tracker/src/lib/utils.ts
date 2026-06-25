@@ -38,6 +38,14 @@ export function formatDistance(meters: number): string {
   return `${(meters / 1000).toFixed(1)}km`;
 }
 
+export function formatDuration(seconds: number): string {
+  const totalMinutes = Math.round(seconds / 60);
+  if (totalMinutes < 60) return `${totalMinutes} min`;
+  const hours = Math.floor(totalMinutes / 60);
+  const mins = totalMinutes % 60;
+  return mins > 0 ? `${hours}h ${mins}min` : `${hours}h`;
+}
+
 export function getMemberColor(index: number): string {
   const colors = [
     "#0ea5e9", "#22c55e", "#f59e0b", "#a855f7",
@@ -49,4 +57,43 @@ export function getMemberColor(index: number): string {
 export function getInviteUrl(inviteCode: string): string {
   const base = window.location.origin + window.location.pathname.replace(/\/$/, "");
   return `${base}?join=${inviteCode}`;
+}
+
+export function getDistanceToSegment(
+  px: number, py: number,
+  ax: number, ay: number,
+  bx: number, by: number
+): number {
+  const dx = bx - ax;
+  const dy = by - ay;
+  if (dx === 0 && dy === 0) {
+    return getDistanceMeters(px, py, ax, ay);
+  }
+  
+  // Calculate projection parameter t, clamped to [0, 1]
+  let t = ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy);
+  t = Math.max(0, Math.min(1, t));
+  
+  const closestLat = ax + t * dx;
+  const closestLng = ay + t * dy;
+  return getDistanceMeters(px, py, closestLat, closestLng);
+}
+
+export function getDistanceToPolyline(
+  lat: number, lng: number,
+  points: { lat: number; lng: number }[]
+): number {
+  if (points.length === 0) return Infinity;
+  if (points.length === 1) return getDistanceMeters(lat, lng, points[0].lat, points[0].lng);
+  
+  let minDist = Infinity;
+  for (let i = 0; i < points.length - 1; i++) {
+    const d = getDistanceToSegment(
+      lat, lng,
+      points[i].lat, points[i].lng,
+      points[i+1].lat, points[i+1].lng
+    );
+    if (d < minDist) minDist = d;
+  }
+  return minDist;
 }

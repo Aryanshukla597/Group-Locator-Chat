@@ -138,6 +138,158 @@ paths:
               schema:
                 $ref: "#/components/schemas/OkResponse"
 
+  /groups/{groupId}/members/me/status:
+    post:
+      operationId: updateMemberStatus
+      tags: [members]
+      summary: Update my online status
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                isOnline:
+                  type: boolean
+              required:
+                - isOnline
+      responses:
+        "200":
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /groups/{groupId}/members/me/active:
+    post:
+      operationId: updateMemberActive
+      tags: [members]
+      summary: Update my active (focused) screen status
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                isActive:
+                  type: boolean
+              required:
+                - isActive
+      responses:
+        "200":
+          description: Active status updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /groups/{groupId}/members/me/read:
+    post:
+      operationId: markMessagesRead
+      tags: [members]
+      summary: Mark group messages up to messageId as read
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                messageId:
+                  type: string
+              required:
+                - messageId
+      responses:
+        "200":
+          description: Messages marked as read
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /groups/{groupId}/members/{memberId}/role:
+    post:
+      operationId: updateMemberRole
+      tags: [members]
+      summary: Update a member's role (promote/demote)
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: memberId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateMemberRoleInput"
+      responses:
+        "200":
+          description: Role updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "403":
+          description: Forbidden
+        "404":
+          description: Member or group not found
+
+  /groups/{groupId}/members/{memberId}:
+    delete:
+      operationId: removeMember
+      tags: [members]
+      summary: Remove a member from the group (kick)
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: memberId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Member removed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "403":
+          description: Forbidden
+        "404":
+          description: Member or group not found
+
   /groups/{groupId}/locations:
     get:
       operationId: getGroupLocations
@@ -277,6 +429,17 @@ paths:
           required: true
           schema:
             type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                category:
+                  type: string
+                  enum: [general, medical, fire, police]
+              required:
+                - category
       responses:
         "200":
           description: SOS triggered
@@ -329,6 +492,105 @@ paths:
               schema:
                 $ref: "#/components/schemas/Message"
 
+  /groups/{groupId}/messages/{messageId}:
+    patch:
+      operationId: editMessage
+      tags: [messages]
+      summary: Edit a chat message
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MessageInput"
+      responses:
+        "200":
+          description: Message updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+        "403":
+          description: Forbidden
+        "404":
+          description: Message not found
+    delete:
+      operationId: deleteMessage
+      tags: [messages]
+      summary: Delete a chat message
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Message deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "403":
+          description: Forbidden
+        "404":
+          description: Message not found
+
+  /groups/{groupId}/messages/{messageId}/pin:
+    post:
+      operationId: pinMessage
+      tags: [messages]
+      summary: Pin or unpin a chat message
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                isPinned:
+                  type: boolean
+              required:
+                - isPinned
+      responses:
+        "200":
+          description: Message pin status updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+        "403":
+          description: Forbidden
+        "404":
+          description: Message not found
+
 components:
   schemas:
     HealthStatus:
@@ -356,6 +618,10 @@ components:
           type: string
         inviteCode:
           type: string
+        isLocked:
+          type: boolean
+        isActive:
+          type: boolean
         createdAt:
           type: string
         memberCount:
@@ -364,6 +630,8 @@ components:
         - id
         - name
         - inviteCode
+        - isLocked
+        - isActive
         - createdAt
         - memberCount
 
@@ -392,6 +660,8 @@ components:
           type: string
           minLength: 1
           maxLength: 50
+        userId:
+          type: string
       required:
         - name
         - creatorName
@@ -405,6 +675,8 @@ components:
           type: string
           minLength: 1
           maxLength: 50
+        userId:
+          type: string
       required:
         - inviteCode
         - memberName
@@ -420,6 +692,15 @@ components:
           type: string
         isLocationSharing:
           type: boolean
+        isOnline:
+          type: boolean
+        isActive:
+          type: boolean
+        role:
+          type: string
+          enum: [owner, admin, member]
+        lastReadMessageId:
+          type: ["string", "null"]
         joinedAt:
           type: string
       required:
@@ -427,6 +708,9 @@ components:
         - name
         - groupId
         - isLocationSharing
+        - isOnline
+        - isActive
+        - role
         - joinedAt
 
     MemberLocation:
@@ -446,6 +730,8 @@ components:
           type: string
         isSharing:
           type: boolean
+        isOnline:
+          type: boolean
       required:
         - memberId
         - memberName
@@ -453,6 +739,7 @@ components:
         - longitude
         - updatedAt
         - isSharing
+        - isOnline
 
     LocationInput:
       type: object
@@ -528,7 +815,17 @@ components:
           type: string
         type:
           type: string
-          enum: [chat, system, sos, meeting_point]
+          enum: [chat, system, sos, sos_medical, sos_fire, sos_police, meeting_point]
+        isPinned:
+          type: boolean
+        replyToId:
+          type: ["string", "null"]
+        replyToName:
+          type: ["string", "null"]
+        replyToContent:
+          type: ["string", "null"]
+        isEdited:
+          type: boolean
         createdAt:
           type: string
       required:
@@ -537,6 +834,8 @@ components:
         - memberName
         - content
         - type
+        - isPinned
+        - isEdited
         - createdAt
 
     MessageInput:
@@ -546,5 +845,16 @@ components:
           type: string
           minLength: 1
           maxLength: 2000
+        replyToId:
+          type: ["string", "null"]
       required:
         - content
+
+    UpdateMemberRoleInput:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [admin, member]
+      required:
+        - role

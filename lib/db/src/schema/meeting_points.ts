@@ -1,15 +1,15 @@
-import { pgTable, text, timestamp, doublePrecision } from "drizzle-orm/pg-core";
+import { mysqlTable, varchar, double, timestamp } from "drizzle-orm/mysql-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
-export const meetingPointsTable = pgTable("meeting_points", {
-  id: text("id").primaryKey(),
-  groupId: text("group_id").notNull().unique(),
-  latitude: doublePrecision("latitude").notNull(),
-  longitude: doublePrecision("longitude").notNull(),
-  label: text("label"),
-  setByName: text("set_by_name").notNull(),
-  setAt: timestamp("set_at", { withTimezone: true }).notNull().defaultNow(),
+export const meetingPointsTable = mysqlTable("meeting_points", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  groupId: varchar("group_id", { length: 36 }).notNull().unique(),
+  latitude: double("latitude").notNull(),
+  longitude: double("longitude").notNull(),
+  label: varchar("label", { length: 200 }),
+  setByName: varchar("set_by_name", { length: 100 }).notNull(),
+  setAt: timestamp("set_at").notNull().defaultNow(),
 });
 
 export const insertMeetingPointSchema = createInsertSchema(meetingPointsTable);

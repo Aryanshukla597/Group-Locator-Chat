@@ -15,5 +15,13 @@ export interface Message {
   memberName: string;
   content: string;
   type: MessageType;
+  isPinned: boolean;
+  /** @nullable */
+  replyToId?: string | null;
+  /** @nullable */
+  replyToName?: string | null;
+  /** @nullable */
+  replyToContent?: string | null;
+  isEdited: boolean;
   createdAt: string;
 }

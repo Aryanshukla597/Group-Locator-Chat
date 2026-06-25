@@ -15,4 +15,5 @@ export interface MemberLocation {
   accuracy?: number | null;
   updatedAt: string;
   isSharing: boolean;
+  isOnline: boolean;
 }

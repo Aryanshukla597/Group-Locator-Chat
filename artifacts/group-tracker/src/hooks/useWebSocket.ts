@@ -4,12 +4,19 @@ import { getSession } from "@/lib/session";
 export type WsMessage =
   | { type: "connected"; payload: { memberId: string } }
   | { type: "location_update"; payload: any }
-  | { type: "location_sharing_changed"; payload: { memberId: string; isSharing: boolean } }
+  | { type: "location_sharing_changed"; payload: { memberId: string; isSharing?: boolean; isOnline?: boolean } }
   | { type: "message"; payload: any }
   | { type: "meeting_point"; payload: any | null }
   | { type: "sos"; payload: { memberName: string; latitude: number | null; longitude: number | null } }
   | { type: "member_joined"; payload: any }
-  | { type: "member_left"; payload: any };
+  | { type: "member_left"; payload: any }
+  | { type: "group_lock_changed"; payload: { isLocked: boolean } }
+  | { type: "group_ended"; payload: any }
+  | { type: "member_role_changed"; payload: { memberId: string; role: string } }
+  | { type: "read_receipt"; payload: { memberId: string; messageId: string } }
+  | { type: "message_updated"; payload: any }
+  | { type: "message_deleted"; payload: { messageId: string } }
+  | { type: "member_active_changed"; payload: { memberId: string; isActive: boolean } };
 
 type MessageHandler = (msg: WsMessage) => void;
 
