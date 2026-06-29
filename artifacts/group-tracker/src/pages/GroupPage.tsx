@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import MapView, { type MapMember, type MapMeetingPoint, type ActiveRoute } from "@/components/MapView";
 import Sidebar from "@/components/Sidebar";
 import { AlertTriangle, X, MapPin, Loader2, Navigation, Clock, Compass, WifiOff, Menu } from "lucide-react";
-import { getDistanceMeters, formatDistance, formatDuration, getDistanceToPolyline, cn } from "@/lib/utils";
+import { getDistanceMeters, formatDistance, formatDuration, getDistanceToPolyline, cn, getApiUrl } from "@/lib/utils";
 
 interface SosAlert {
   id: string;
@@ -225,7 +225,7 @@ export default function GroupPage() {
     const markOffline = () => {
       const s = getSession();
       if (!s) return;
-      fetch(`/api/groups/${groupId}/members/me/status`, {
+      fetch(getApiUrl(`/api/groups/${groupId}/members/me/status`), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -239,7 +239,7 @@ export default function GroupPage() {
     const markOnline = () => {
       const s = getSession();
       if (!s) return;
-      fetch(`/api/groups/${groupId}/members/me/status`, {
+      fetch(getApiUrl(`/api/groups/${groupId}/members/me/status`), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

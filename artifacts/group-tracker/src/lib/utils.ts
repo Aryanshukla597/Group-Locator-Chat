@@ -97,3 +97,10 @@ export function getDistanceToPolyline(
   }
   return minDist;
 }
+
+export function getApiUrl(path: string): string {
+  const apiBaseUrl = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "https://group-locator-production.up.railway.app" : "");
+  const cleanBase = apiBaseUrl.replace(/\/+$/, "");
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  return cleanBase ? `${cleanBase}${cleanPath}` : cleanPath;
+}

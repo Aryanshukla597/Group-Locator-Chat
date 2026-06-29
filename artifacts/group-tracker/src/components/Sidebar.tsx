@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useLeaveGroup, useUpdateLocationSharing, useSendMessage, useClearMeetingPoint, usePinMessage, useMarkMessagesRead, useEditMessage, useDeleteMessage } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getGetGroupLocationsQueryKey, getGetGroupMembersQueryKey, getGetMeetingPointQueryKey, getGetGroupQueryKey, getListMessagesQueryKey } from "@workspace/api-client-react";
-import { getInviteUrl, getMemberColor, formatTime, formatDistance, getDistanceMeters } from "@/lib/utils";
+import { getInviteUrl, getMemberColor, formatTime, formatDistance, getDistanceMeters, getApiUrl } from "@/lib/utils";
 import { clearSession, type GroupSession } from "@/lib/session";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
@@ -305,7 +305,7 @@ export default function Sidebar({
   const handleLockToggle = async () => {
     setLockPending(true);
     try {
-      await fetch(`/api/groups/${session.groupId}/lock`, {
+      await fetch(getApiUrl(`/api/groups/${session.groupId}/lock`), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -327,7 +327,7 @@ export default function Sidebar({
     }
     setEndPending(true);
     try {
-      const response = await fetch(`/api/groups/${session.groupId}/end`, {
+      const response = await fetch(getApiUrl(`/api/groups/${session.groupId}/end`), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -910,7 +910,7 @@ export default function Sidebar({
                                   setOpenMemberMenuId(null);
                                   const newRole = m.role === "admin" ? "member" : "admin";
                                   try {
-                                    const response = await fetch(`/api/groups/${session.groupId}/members/${m.id}/role`, {
+                                    const response = await fetch(getApiUrl(`/api/groups/${session.groupId}/members/${m.id}/role`), {
                                       method: "POST",
                                       headers: {
                                         "Content-Type": "application/json",
@@ -948,7 +948,7 @@ export default function Sidebar({
                                   setOpenMemberMenuId(null);
                                   if (!window.confirm(`Are you sure you want to remove ${m.name} from the group?`)) return;
                                   try {
-                                    const response = await fetch(`/api/groups/${session.groupId}/members/${m.id}`, {
+                                    const response = await fetch(getApiUrl(`/api/groups/${session.groupId}/members/${m.id}`), {
                                       method: "DELETE",
                                       headers: {
                                         Authorization: `Bearer ${session.token}`,
