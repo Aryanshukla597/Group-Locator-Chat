@@ -54,4 +54,12 @@ app.get("/", (req: Request, res: Response) => {
   res.json({ status: "ok" });
 });
 
+// Global Error Handler
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  logger.error(err, "Unhandled error in request");
+  res.status(err.status || 500).json({
+    error: err.message || "Internal Server Error",
+  });
+});
+
 export default app;

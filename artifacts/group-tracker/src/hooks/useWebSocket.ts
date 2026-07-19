@@ -33,12 +33,14 @@ export function useWebSocket(groupId: string | undefined, onMessage: MessageHand
     const session = getSession();
     if (!session) return;
 
-    const apiBaseUrl = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "https://group-locator-production.up.railway.app" : "");
-    const apiHost = apiBaseUrl
-      ? apiBaseUrl.replace(/https?:\/\//, "")
+    const apiBaseUrl = import.meta.env.VITE_API_URL || "";
+    // WebSockets cannot be proxied by Vercel serverless rewrites, so we must point directly to the Railway backend URL in production.
+    const wsBaseUrl = apiBaseUrl || (import.meta.env.PROD ? "https://group-locator-production.up.railway.app" : "");
+    const apiHost = wsBaseUrl
+      ? wsBaseUrl.replace(/https?:\/\//, "")
       : window.location.host;
-    const proto = apiBaseUrl
-      ? (apiBaseUrl.startsWith("https") ? "wss:" : "ws:")
+    const proto = wsBaseUrl
+      ? (wsBaseUrl.startsWith("https") ? "wss:" : "ws:")
       : (window.location.protocol === "https:" ? "wss:" : "ws:");
 
     const url = `${proto}//${apiHost}/api/ws?groupId=${groupId}&token=${session.token}`;

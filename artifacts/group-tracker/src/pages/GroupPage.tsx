@@ -113,9 +113,9 @@ export default function GroupPage() {
   const { toast } = useToast();
 
   const { data: group } = useGetGroup(groupId);
-  const { data: members = [] } = useGetGroupMembers(groupId);
-  const { data: locations = [], isLoading: locsLoading } = useGetGroupLocations(groupId);
-  const { data: meetingPoint = null } = useGetMeetingPoint(groupId);
+  const { data: members = [] } = useGetGroupMembers(groupId, { query: { refetchInterval: 5000 } as any });
+  const { data: locations = [], isLoading: locsLoading } = useGetGroupLocations(groupId, { query: { refetchInterval: 5000 } as any });
+  const { data: meetingPoint = null } = useGetMeetingPoint(groupId, { query: { refetchInterval: 5000 } as any });
 
   // Redirect if no session or wrong group
   useEffect(() => {

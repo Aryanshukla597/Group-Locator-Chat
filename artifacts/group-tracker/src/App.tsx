@@ -7,7 +7,7 @@ import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/HomePage";
 import GroupPage from "@/pages/GroupPage";
 
-const apiUrl = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "https://group-locator-production.up.railway.app" : "");
+const apiUrl = import.meta.env.VITE_API_URL || "";
 if (apiUrl) {
   setBaseUrl(apiUrl);
 }

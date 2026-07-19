@@ -361,12 +361,26 @@ export async function customFetch<T = unknown>(
 
   const requestInfo = { method, url: resolveUrl(input) };
 
-  const response = await fetch(input, { ...init, method, headers });
+  console.log(`[API CLIENT REQUEST] ${method} ${requestInfo.url}`, {
+    headers,
+    body: init.body,
+  });
+
+  let response: Response;
+  try {
+    response = await fetch(input, { ...init, method, headers });
+  } catch (error: any) {
+    console.error(`[API CLIENT FETCH NETWORK ERROR] ${method} ${requestInfo.url}`, error);
+    throw error;
+  }
 
   if (!response.ok) {
     const errorData = await parseErrorBody(response, method);
+    console.error(`[API CLIENT RESPONSE ERROR] ${method} ${requestInfo.url} Status: ${response.status} ${response.statusText}`, errorData);
     throw new ApiError(response, errorData, requestInfo);
   }
 
-  return (await parseSuccessBody(response, responseType, requestInfo)) as T;
+  const parsed = (await parseSuccessBody(response, responseType, requestInfo)) as T;
+  console.log(`[API CLIENT RESPONSE SUCCESS] ${method} ${requestInfo.url} Status: ${response.status}`, parsed);
+  return parsed;
 }

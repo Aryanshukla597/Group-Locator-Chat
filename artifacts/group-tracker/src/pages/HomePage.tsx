@@ -68,7 +68,10 @@ export default function HomePage() {
           });
           setLocation(`/group/${result.group.id}`);
         },
-        onError: () => setFormError("Failed to create group. Please try again."),
+        onError: (err: any) => {
+          console.error("[HOME] Create group mutation failed:", err);
+          setFormError("Failed to create group. Please try again.");
+        },
       }
     );
   };
@@ -96,6 +99,7 @@ export default function HomePage() {
           setLocation(`/group/${result.group.id}`);
         },
         onError: (err: any) => {
+          console.error("[HOME] Join group mutation failed:", err);
           const msg = err?.response?.data?.error || err?.message || "";
           if (msg.includes("ended")) {
             setFormError("🔒 This group has ended. New members cannot join.");
