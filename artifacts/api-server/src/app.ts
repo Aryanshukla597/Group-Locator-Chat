@@ -29,14 +29,19 @@ app.use(
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || process.env.NODE_ENV === "development") {
+      if (!origin || origin === "null" || origin === "null/" || process.env.NODE_ENV === "development") {
         return callback(null, true);
       }
       const isLocalhost = origin.startsWith("http://localhost:") || origin === "http://localhost" || origin.startsWith("http://127.0.0.1:") || origin === "http://127.0.0.1";
       const isVercel = origin.endsWith(".vercel.app");
       const isRailway = origin.endsWith(".up.railway.app");
       const isNgrok = origin.endsWith(".ngrok-free.dev") || origin.endsWith(".ngrok.io");
-      if (isLocalhost || isVercel || isRailway || isNgrok) {
+
+      const allowedOrigins = process.env.ALLOWED_ORIGINS
+        ? process.env.ALLOWED_ORIGINS.split(",").map((o) => o.trim())
+        : [];
+
+      if (isLocalhost || isVercel || isRailway || isNgrok || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
