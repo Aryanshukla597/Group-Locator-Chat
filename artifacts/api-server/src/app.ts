@@ -30,10 +30,11 @@ app.use(
   cors({
     origin: (origin, callback) => {
       if (!origin) return callback(null, true);
-      const isLocalhost = origin.startsWith("http://localhost:") || origin === "http://localhost";
+      const isLocalhost = origin.startsWith("http://localhost:") || origin === "http://localhost" || origin.startsWith("http://127.0.0.1:") || origin === "http://127.0.0.1";
       const isVercel = origin.endsWith(".vercel.app");
       const isRailway = origin.endsWith(".up.railway.app");
-      if (isLocalhost || isVercel || isRailway) {
+      const isNgrok = origin.endsWith(".ngrok-free.dev") || origin.endsWith(".ngrok.io");
+      if (isLocalhost || isVercel || isRailway || isNgrok) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
